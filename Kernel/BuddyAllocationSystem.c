@@ -25,8 +25,6 @@ typedef struct list_t {
     struct list_t * next, * prev;
 } list_t;
 
-void dumpMemory();
-
 static uint8_t * baseAdress;
 extern uint8_t endOfKernel;
 static list_t * buckets[BUCKET_AMOUNT];
