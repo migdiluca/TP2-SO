@@ -65,20 +65,6 @@ int bucketRequest(size_t request) {
     return bucket;
 }
 
-//list_t * removeFromListRec(list_t * node, list_t * current) {
-//    if (current == node) {
-//        return current->next;
-//    } else {
-//        current->next = removeFromListRec(node, current->next);
-//        return current;
-//    }
-//}
-//
-//void removeFromList(int level, list_t * node) {
-//    buckets[level] = removeFromListRec(node, buckets[level]);
-//}
-
-
 list_t * popList(int level) {
     list_t * aux = buckets[level];
     buckets[level] = aux->next;
