@@ -32,8 +32,7 @@ extern uint8_t endOfKernel;
 static list_t * buckets[BUCKET_AMOUNT];
 static int splitBlocks[(1 << (BUCKET_AMOUNT - 1))];
 static int allocatedBlocks[1 << (BUCKET_AMOUNT)];
-static char buff[8];
-static Colour colour = {255, 255, 255};
+
 
 int indexInLevelOf(uint8_t * memoryAdr, int level) {
     return((memoryAdr - baseAdress) >> (29 - level)) + (1 << level) - 1;
