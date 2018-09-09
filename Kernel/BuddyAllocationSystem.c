@@ -28,8 +28,8 @@ typedef struct list_t {
 static uint8_t * baseAdress;
 extern uint8_t endOfKernel;
 static list_t * buckets[BUCKET_AMOUNT];
-static int splitBlocks[(1 << (BUCKET_AMOUNT - 1))];
-static int allocatedBlocks[1 << (BUCKET_AMOUNT)];
+static char splitBlocks[(1 << (BUCKET_AMOUNT - 1))];
+static char allocatedBlocks[1 << (BUCKET_AMOUNT)];
 
 
 int indexInLevelOf(uint8_t * memoryAdr, int level) {
@@ -78,7 +78,7 @@ void pushList(int level, uint8_t * memoryAdr) {
 }
 
 void removeFromList(int level, list_t * node) {
-    if (node == buckets[level]) { // es el primer elemento de la lista
+    if (node == buckets[level]) {
         popList(level);
         return;
     }
