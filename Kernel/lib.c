@@ -1,4 +1,6 @@
-#include <stdint.h>
+#include "lib.h"
+
+
 
 void * memset(void * destination, int32_t c, uint64_t length)
 {
@@ -48,3 +50,12 @@ void * memcpy(void * destination, const void * source, uint64_t length)
 
 	return destination;
 }
+
+
+// /*Recibe un puntero a un string, reserva espacio en memoria y lo copia alli*/
+// char* duplicateString(const char* string){
+//   int len = strlen(string);
+//   char* newString = mallocMemory(sizeof(char)*(len+1));
+//   memcpy(newString, string, len+1);
+// return newString;
+// }

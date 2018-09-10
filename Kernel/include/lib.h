@@ -2,6 +2,8 @@
 #define LIB_H
 
 #include <stdint.h>
+#include <string.h>
+#include "BuddyAllocationSystem.h"
 
 //Estructura para RGB.
 struct RGB{
@@ -14,5 +16,7 @@ void * memset(void * destination, int32_t character, uint64_t length);
 void * memcpy(void * destination, const void * source, uint64_t length);
 
 char *cpuVendor(char *result);
+
+char* duplicateString(const char* string);
 
 #endif
