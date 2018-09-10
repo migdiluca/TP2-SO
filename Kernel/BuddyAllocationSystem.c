@@ -9,8 +9,8 @@
 #define TRUE 1
 #define FALSE 0
 
-#define BUCKET_AMOUNT 25
-#define LEAF_SIZE  32
+#define BUCKET_AMOUNT 26
+#define LEAF_SIZE 16
 
 #define total_size (1<<BUCKET_AMOUNT) * LEAF_SIZE
 #define size_of_level(n) (total_size / (1<<(n)))
@@ -21,6 +21,10 @@
 #define move_to_right_child(index) ((index) * 2 + 2)
 #define move_to_sibling(index) ((((index) - 1) ^ 1) + 1)
 
+#define array_size(array) (array / 8 + (!! (array % 8)))
+#define toggle_bit(array, i) (array[i / 8] ^= 1 << (i % 8))
+#define get_bit(array, i) (1 & (array[i / 8] >> (i % 8)))
+
 typedef struct list_t {
     struct list_t * next, * prev;
 } list_t;
@@ -28,9 +32,9 @@ typedef struct list_t {
 static uint8_t * baseAdress;
 extern uint8_t endOfKernel;
 static list_t * buckets[BUCKET_AMOUNT];
-static char splitBlocks[(1 << (BUCKET_AMOUNT - 1))];
-static char allocatedBlocks[1 << (BUCKET_AMOUNT)];
-
+static char splitBlocks[array_size(1 << (BUCKET_AMOUNT - 1))];
+static char allocatedBlocks[array_size(1 << (BUCKET_AMOUNT))];
+//static char buff[8];
 
 int indexInLevelOf(uint8_t * memoryAdr, int level) {
     return((memoryAdr - baseAdress) >> (29 - level)) + (1 << level) - 1;
@@ -45,11 +49,6 @@ void init() {
     list_t * node = (list_t *)baseAdress;
     node->next = NULL;
     buckets[0] = node;
-    for (int i = 0; i < (1 << (BUCKET_AMOUNT - 1)); i++) {
-        splitBlocks[i] = FALSE;
-    } for (int i = 0;  i < 1 << (BUCKET_AMOUNT); i++) {
-        allocatedBlocks[i] = FALSE;
-    }
 }
 
 int bucketRequest(size_t request) {
@@ -94,7 +93,7 @@ void removeFromList(int level, list_t * node) {
 
 int blockHasBeenSplit(uint8_t * memoryAdr, int level) {
     int index = indexInLevelOf(memoryAdr, level);
-    return splitBlocks[index];
+    return get_bit(splitBlocks, index);
 }
 
 int findLevel(uint8_t * memoryAdr) {
@@ -109,11 +108,11 @@ int findLevel(uint8_t * memoryAdr) {
 }
 
 int isParentSplit(int index) {
-    return splitBlocks[move_to_parent(index)];
+    return get_bit(splitBlocks, move_to_parent(index));
 }
 
 void flipParentSplit(int index) {
-    splitBlocks[move_to_parent(index)] = !splitBlocks[move_to_parent(index)];
+    toggle_bit(splitBlocks, move_to_parent(index));
 }
 
 void * mallocMemory(size_t request) {
@@ -129,7 +128,7 @@ void * mallocMemory(size_t request) {
     }
     list_t * list = popList(level);
     int index = indexInLevelOf((uint8_t *)list, level);
-    allocatedBlocks[index] = TRUE;
+    toggle_bit(allocatedBlocks, index);
     return (void *)list;
 }
 
@@ -150,7 +149,7 @@ int getNextFreeBlock(int level) {
 void splitBlock(int level) {
     list_t * aux = popList(level);
     int index = indexInLevelOf(aux, level);
-    splitBlocks[index] = TRUE;
+    toggle_bit(splitBlocks,index);
     pushList(level+1, adress(move_to_right_child(index), level+1));
     pushList(level+1, adress(move_to_left_child(index), level+1));
 }
@@ -161,33 +160,35 @@ void freeMemory(void * memoryAdr) {
     }
     int level = findLevel(memoryAdr);
     int index = indexInLevelOf(memoryAdr, level);
-    allocatedBlocks[index] = FALSE;
+    toggle_bit(allocatedBlocks, index);
     while (index > 0) {
-        if (allocatedBlocks[move_to_sibling(index)]) {
+        if (get_bit(allocatedBlocks, move_to_sibling(index)) || get_bit(splitBlocks, move_to_sibling(index))) {
             break;
         }
         removeFromList(level, (list_t *)adress(move_to_sibling(index), level));
         index = move_to_parent(index);
-        splitBlocks[index] = FALSE;
+        toggle_bit(splitBlocks,index);
         level--;
     }
     pushList(level, adress(index, level));
 }
 
 void * reallocMemory(void * memorySrc, size_t request) {
-    uint8_t * aux = (uint8_t *)memorySrc;
-    uint8_t * memoryAdr = mallocMemory(request);
-    int level = findLevel(aux);
+    int level = findLevel(memorySrc);
     int size = size_of_level(level);
+    if (size >= request) {
+        return memorySrc;
+    }
+    char * memoryAdr = mallocMemory(request);
     for (int i = 0; i < size; i++) {
-         *(memoryAdr+i) = *(aux+i);
+        *(memoryAdr+i) = *((char *)memorySrc+i);
     }
     freeMemory(memorySrc);
     return memoryAdr;
 }
 
 void * callocMemory(size_t request) {
-    uint8_t * memoryAdr = (uint8_t *)mallocMemory(request);
+    char * memoryAdr = mallocMemory(request);
     for (int i = 0; i < request; i++) {
         *(memoryAdr+i) = 0;
     }
@@ -209,15 +210,18 @@ void dumpMemory() {
 //            putStr(" -- ", colour);
 //            putStr(buff, colour);
 //            if (!is_leaf_block(index)) {
-//                if (splitBlocks[index]) {
+//                if (get_bit(splitBlocks,index)) {
 //                    putStr(" is Split", colour);
-//                    index++;
-//                    continue;
+//                    //putStr(" --", colour);
+//                    //putChar('\n', colour);
+//                    //index++;
+//                    //continue;
 //                }
 //            }
-//            if (allocatedBlocks[index]) {
+//            if (get_bit(allocatedBlocks, index)) {
 //                putStr(" is Allocated", colour);
-//            } else {
+//            }
+//            else {
 //                putStr(" is Free", colour);
 //            }
 //            index++;
