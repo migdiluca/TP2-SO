@@ -1,9 +1,3 @@
-//
-//  BuddyAllocationSystem.c
-//  TPARQUI
-//
-//  Created by Fermin Gomez on 9/3/18.
-//
 #include "BuddyAllocationSystem.h"
 
 #define TRUE 1

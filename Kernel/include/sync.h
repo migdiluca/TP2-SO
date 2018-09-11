@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef mutex_h
-#define mutex_h
+#ifndef sync_h
+#define sync_h
 
 #include <stdio.h>
 #include "interrupts.h"
@@ -15,11 +15,21 @@
 
 typedef struct mutex {
     char value;
+    int mutex_holder;
     queueADT queue;
 } mutex;
 
-mutex * initMutex();
+typedef struct semaphore {
+    char value;
+    queueADT queue;
+} semaphore;
+
+mutex * initMutex(int value);
 void acquire(mutex * m);
 void release(mutex * m);
+
+semaphore * initSem();
+void wait(semaphore * s);
+void signal(semaphore * s);
 
 #endif /* mutex_h */
