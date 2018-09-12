@@ -7,6 +7,7 @@ typedef struct TNode {
 
 typedef struct queueCDT {
     size_t bytes;
+    int (*cmp)(void *, void *);
     TNode * last;
     TNode * first;
 } queueCDT;
@@ -16,10 +17,22 @@ queueADT newQueue(size_t bytes) {
     queueADT new = mallocMemory(sizeof(*new));
     new->bytes = bytes;
     new->first = new->last = NULL;
+    new->cmp = NULL;
+    return new;
+}
+
+queueADT newQueue(size_t bytes, int (*cmp)(void *, void *)) {
+    queueADT new = mallocMemory(sizeof(*new));
+    new->bytes = bytes;
+    new->first = new->last = NULL;
+    new->cmp = cmp;
     return new;
 }
 
 void add(queueADT q, void * elem) {
+    if (q == NULL) {
+        return;
+    }
     if (q->first == NULL) {
         TNode * new = mallocMemory(sizeof(*new));
         new->elem = mallocMemory(q->bytes);
@@ -39,6 +52,9 @@ void add(queueADT q, void * elem) {
 }
 
 void * get(queueADT q) {
+    if (q == NULL) {
+        return;
+    }
     if (q->first == NULL) {
         return NULL;
     }
@@ -51,7 +67,55 @@ void * get(queueADT q) {
     return out;
 }
 
+static
+TNode * removeREC(TNode * current, TNode * prev, void * elem, queueADT q) {
+    if (current == NULL) {
+        return NULL;
+    } if (!(*q->cmp)(current->elem, elem)) {
+        if (current == q->last) {
+            q->last = prev;
+        }
+        return current->next;
+    } else {
+        current->next = belongsREC(current->next, elem, cmp);
+        return current;
+    }
+}
+
+void remove(queueADT q, void * elem) {
+    if (q == NULL) {
+        return;
+    }
+    if (q->cmp == NULL) {
+        return0;
+    }
+    first = removeREC(q->first, elem, q->cmp);
+}
+
+static
+int belongsREC(TNode * node, void * elem, int (*cmp)(void *, void *)) {
+    if (node == NULL) { // llego al final y no lo encontro
+        return 0;
+    } if (!(*cmp)(node->elem, elem)) { // si son iguales entonces lo encontre
+        return 1;
+    } else
+        return 0 + belongsREC(node->next, elem, cmp);
+}
+
+int belongs(queueADT q, void * elem) {
+    if (q == NULL) {
+        return;
+    }
+    if (q->cmp == NULL) {
+        return0;
+    }
+    return belongsREC(q->first, elem, q->cmp);
+}
+
 void freeQueue(queueADT q) {
+    if (q == NULL) {
+        return;
+    }
     TNode * queue = q->first;
     while (queue != NULL) {
         TNode * aux = queue;
