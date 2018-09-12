@@ -7,7 +7,7 @@
  */
 mutex * initMutex() {
     mutex * m;
-    m->queue = newQueue(sizeof(int));
+    m->queue = newQueue(sizeof(int), NULL);
     m->value = 1;
     return m;
 }
@@ -21,7 +21,7 @@ void acquire(mutex * m) {
     _cli();
     
     if (m->value == 0) { // esta tomado
-        //add(m->queue, getMyPid());
+        //push(m->queue, getMyPid());
         //block(getMyPid());
     }
     
@@ -39,10 +39,10 @@ void acquire(mutex * m) {
 void release(mutex * m) {
     _cli();
     
-    if (mutex_holder == getMyPid()) {
-        m->value = 1;
-        //wakeUp(*(get(m->queue)));
-    }
+//    if (mutex_holder == getMyPid()) {
+//        m->value = 1;
+//        //wakeUp(*(pop(m->queue)));
+//    }
     
     _sti();
 }
@@ -54,7 +54,7 @@ void release(mutex * m) {
  */
 semaphore * initSem(int value) {
     semaphore * sem;
-    sem->queue = newQueue(sizeof(int));
+    sem->queue = newQueue(sizeof(int), NULL);
     sem->value = value;
     return sem;
 }
@@ -69,7 +69,7 @@ void wait(semaphore * s) {
     
     s->value--;
     if (s->value < 0) {
-        //add(s->queue, getMyPid());
+        //push(s->queue, getMyPid());
         //block(getMyPid());
     }
     
@@ -86,7 +86,7 @@ void signal(semaphore * s) {
     
     s->value++;
     if (s->value <= 0) {
-        //wakeUp(*(get(s->queue)));
+        //wakeUp(*(pop(s->queue)));
     }
     
     _sti();

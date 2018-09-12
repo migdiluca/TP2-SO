@@ -24,11 +24,11 @@ typedef struct semaphore {
     queueADT queue;
 } semaphore;
 
-mutex * initMutex(int value);
+mutex * initMutex();
 void acquire(mutex * m);
 void release(mutex * m);
 
-semaphore * initSem();
+semaphore * initSem(int value);
 void wait(semaphore * s);
 void signal(semaphore * s);
 

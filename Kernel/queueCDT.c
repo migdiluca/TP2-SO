@@ -1,9 +1,9 @@
 #include "queueADT.h"
-
 typedef struct TNode {
     struct TNode * next;
     void * elem;
 } TNode;
+
 
 typedef struct queueCDT {
     size_t bytes;
@@ -12,14 +12,8 @@ typedef struct queueCDT {
     TNode * first;
 } queueCDT;
 
-
-queueADT newQueue(size_t bytes) {
-    queueADT new = mallocMemory(sizeof(*new));
-    new->bytes = bytes;
-    new->first = new->last = NULL;
-    new->cmp = NULL;
-    return new;
-}
+static TNode * removeREC(TNode * current, TNode * prev, void * elem, queueADT q);
+static int belongsREC(TNode * node, void * elem, int (*cmp)(void *, void *));
 
 queueADT newQueue(size_t bytes, int (*cmp)(void *, void *)) {
     queueADT new = mallocMemory(sizeof(*new));
@@ -29,7 +23,7 @@ queueADT newQueue(size_t bytes, int (*cmp)(void *, void *)) {
     return new;
 }
 
-void add(queueADT q, void * elem) {
+void push(queueADT q, void * elem) {
     if (q == NULL) {
         return;
     }
@@ -51,9 +45,9 @@ void add(queueADT q, void * elem) {
     }
 }
 
-void * get(queueADT q) {
+void * pop(queueADT q) {
     if (q == NULL) {
-        return;
+        return NULL;
     }
     if (q->first == NULL) {
         return NULL;
@@ -77,19 +71,19 @@ TNode * removeREC(TNode * current, TNode * prev, void * elem, queueADT q) {
         }
         return current->next;
     } else {
-        current->next = belongsREC(current->next, elem, cmp);
+        current->next = belongsREC(current->next, elem, q);
         return current;
     }
 }
 
-void remove(queueADT q, void * elem) {
+void removeElem(queueADT q, void * elem) {
     if (q == NULL) {
         return;
     }
     if (q->cmp == NULL) {
-        return0;
+        return;
     }
-    first = removeREC(q->first, elem, q->cmp);
+    q->first = removeREC(q->first, NULL, elem, q);
 }
 
 static
@@ -102,12 +96,12 @@ int belongsREC(TNode * node, void * elem, int (*cmp)(void *, void *)) {
         return 0 + belongsREC(node->next, elem, cmp);
 }
 
-int belongs(queueADT q, void * elem) {
+int belongsElem(queueADT q, void * elem) {
     if (q == NULL) {
-        return;
+        return 0;
     }
     if (q->cmp == NULL) {
-        return0;
+        return 0;
     }
     return belongsREC(q->first, elem, q->cmp);
 }
