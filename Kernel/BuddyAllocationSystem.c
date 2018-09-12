@@ -6,7 +6,7 @@
 #define BUCKET_AMOUNT 26
 #define LEAF_SIZE 16
 
-#define total_size (1<<BUCKET_AMOUNT) * LEAF_SIZE
+#define total_size (1<<(BUCKET_AMOUNT-1)) * LEAF_SIZE
 #define size_of_level(n) (total_size / (1<<(n)))
 #define max_blocks_of_level(n)  ((1<<(n)))
 #define is_leaf_block(n) ((1 << (BUCKET_AMOUNT - 1)) <= (n)) ? TRUE : FALSE
