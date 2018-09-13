@@ -25,6 +25,7 @@ EXTERN exceptionDispatcher
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
 EXTERN main
+EXTERN dispatcher
 
 SECTION .text
 
@@ -136,7 +137,28 @@ _exception6Handler:
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:
-	irqHandlerMaster 0
+irqHandlerMaster 0
+
+
+	;8254 Timer (Timer Tick)
+	;_irq00Handler:
+	;	pushState
+
+	;	mov rdi, rsp
+	;	call dispatcher
+	;	mov rsp, rax
+
+	;	popState
+
+		;EOI
+	;	mov al, 20h
+	;	out 20h, al
+
+	;	iretq
+
+
+
+
 
 ;Keyboard
 _irq01Handler:

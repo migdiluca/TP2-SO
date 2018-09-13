@@ -1,26 +1,6 @@
-#define N_PROCESSES 20
-
-#include "process.h"
-
-typedef struct processNode{
-  tProcess* process;
-  struct processNode * next;
-}tProcessNode;
-
-typedef struct{
-  tProcessNode* first;
-  tProcessNode* last;
-  int processAmount;
-}tProcessQueue;
-
+#include "scheduler.h"
 
 static tProcessQueue processQueue;
-
-int removeProcessFromQueue(tProcess* process);
-tProcessNode* removeProcessFromQueueR(tProcessNode* current , int pid);
-int addProcessToQueue(tProcess* process);
-void startScheduler();
-
 
 
 
@@ -28,10 +8,6 @@ void startScheduler();
 void startScheduler(){
   processQueue.processAmount =0;
 }
-
-
-
-
 
 
 int addProcessToQueue(tProcess* process){

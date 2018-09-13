@@ -3,7 +3,7 @@
 
 static int nextPid = 1; //Esta variable le asigna a cada proceso un pid distinto
 
-tProcess* createProcess(int argc, char* argv[], int parentPid, char* processName, void* startingPoint){
+tProcess* createProcess(char* processName,void* startingPoint, int parentPid, int argc, char* argv[]){
   /*Se reserva espacio para la estructura del proceso*/
   tProcess* process = mallocMemory(sizeof(tProcess));
 
@@ -20,8 +20,6 @@ return process;
 
 
 //RowDaBoat
-/* Los valores 0x001, 0x002, etc fueron puestos para debuggear luego*/
-//ESTO TODAVIA LO TENGO Q VERIFICAR
 void* initializeStack(void* stackPointer, int argc, char* argv[], void* startingPoint){
   tStackFrame* stackFrame = (tStackFrame*) stackPointer;
   stackFrame->gs= 0x001;

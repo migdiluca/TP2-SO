@@ -47,7 +47,7 @@ typedef struct {
 } tStackFrame;
 
 
-tProcess* createProcess(int argc, char* argv[], int parentPid, char* processName, void* startingPoint);
+tProcess* createProcess(char* processName,void* startingPoint, int parentPid, int argc, char* argv[]);
 void deleteProcess(tProcess* process);
 void* initializeStack(void* stackPointer, int argc, char* argv[], void* startingPoint);
 
