@@ -140,7 +140,7 @@ _irq00Handler:
 irqHandlerMaster 0
 
 
-	;8254 Timer (Timer Tick)
+;	8254 Timer (Timer Tick)
 	;_irq00Handler:
 	;	pushState
 

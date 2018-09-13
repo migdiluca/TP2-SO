@@ -1,6 +1,6 @@
 #include <lib.h>
 #include <stdint.h>
-
+#include <font.h>
 
 struct vesa_mode {
 	uint16_t attributes;		// deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -142,3 +142,34 @@ struct vesa_mode {
 			}
 		}
 	}
+
+
+	void writeChar(char c, uint64_t x, uint64_t y, uint64_t size){
+	    if(c < 32 || c > 255)
+	      return;
+
+	    struct RGB coloraux = {255,255,255};
+	    struct RGB black = {0,0,0};
+	    char * posOfChar = getCharPos(c);
+	    for(int j = 0; j < CHAR_HEIGHT ; j++) {
+	      for(int i = 0, k = 128; i < CHAR_WIDTH; i++, k/=2){
+	        if(k & posOfChar[j])
+	          writeBlock(i*size + x, j*size + y, coloraux,size,size);
+	        else
+	          writeBlock(i*size + x, j*size + y, black,size,size);
+	      }
+	    }
+	  }
+
+	  void writeString(char* string, uint64_t x, uint64_t y, uint64_t size){
+	    while(*string != 0){
+	      writeChar(*string,x,y,size);
+	      x += (CHAR_WIDTH + 1) * size;
+	      string++;
+	    }
+	  }
+
+	  void clearScreen() {
+	    struct RGB black={0,0,0};
+	    fillScreen(black);
+	  }

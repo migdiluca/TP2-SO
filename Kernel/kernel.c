@@ -25,6 +25,7 @@ static void * const sampleCodeModuleAddress = (void*)0x400000;
 static void * const sampleDataModuleAddress = (void*)0x500000;
 
 typedef int (*EntryPoint)();
+int probandoEscribirEnKernel();
 
 
 void clearBSS(void * bssAddress, uint64_t bssSize)
@@ -58,10 +59,16 @@ void * initializeKernelBinary()
 	return getStackBase();
 }
 
+int probandoEscribirEnKernel(){
+	writeString("probando",5,5,10);
+}
+
 int main()
 {
 	load_idt();
 	setUpBuffers();
+
+	//probandoEscribirEnKernel();
 
 	instructionPointerBackup = sampleCodeModuleAddress;
 	stackPointerBackup = getStackPointer() + 2*8;

@@ -25,4 +25,10 @@ void writeBlock(uint64_t width, uint64_t height, struct RGB color, uint64_t size
 // Escribe todos los pixeles de la pantalla del color decibido.
 void fillScreen(struct RGB color);
 
+void writeBlock(uint64_t width, uint64_t height, struct RGB color, uint64_t sizeX,uint64_t sizeY);
+
+void writeChar(char c, uint64_t x, uint64_t y, uint64_t size);
+void writeString(char* string, uint64_t x, uint64_t y, uint64_t size);
+void clearScreen(); 
+
 #endif
