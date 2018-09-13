@@ -13,7 +13,7 @@ tProcess* createProcess(int argc, char* argv[], int parentPid, char* processName
   //process->name = duplicateString(processName); //lo comente pq no estaba reconociendome strlen aunque ponia include string.h
   process->processMemoryLowerAddress = mallocMemory(PROCESS_SIZE);
   void* processMemoryUpperAddress = process->processMemoryLowerAddress + PROCESS_SIZE -1;
-  process->stackPointer = initializeStack(processMemoryUpperAddress , argc, argv, startingPoint);
+  process->stackPointer = initializeStack(processMemoryUpperAddress - sizeof(tStackFrame) +1 , argc, argv, startingPoint);
   process->state = READY;
 return process;
 }
@@ -37,12 +37,10 @@ void* initializeStack(void* stackPointer, int argc, char* argv[], void* starting
   stackFrame->rsi= (uint64_t)argv;
   stackFrame->rdi= (uint64_t)argc;
   stackFrame->rbp= 0x00D;
-//  stackFrame->rdx= (uint64_t)startingPoint;
  stackFrame->rdx= 0x00;
   stackFrame->rcx= 0x00F;
   stackFrame->rbx= 0x010;
   stackFrame->rax= 0x011;
-  // stackFrame->rip= (uint64_t)&callProcess; //ACA Q VA
   stackFrame->rip= (uint64_t)startingPoint;
   stackFrame->cs=	0x008;
   stackFrame->eflags= 0x202;
