@@ -11,10 +11,10 @@ struct Buffer {
 static struct Buffer std_buffers[3];
 
 void setUpBuffers() {
-	struct Buffer std_out = {.buffer = {0}, .start = 0, .size = 0};
-	std_buffers[0] = std_out;
 	struct Buffer std_in = {.buffer = {0}, .start = 0, .size = 0};
-	std_buffers[1] = std_in;
+    std_buffers[0] = std_in;
+	struct Buffer std_out = {.buffer = {0}, .start = 0, .size = 0};
+    std_buffers[1] = std_out;
 	struct Buffer std_err = {.buffer = {0}, .start = 0, .size = 0};
 	std_buffers[2] = std_err;
 
