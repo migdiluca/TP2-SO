@@ -30,12 +30,6 @@ int addProcessToQueue(tProcess* process){
 }
 
 
-
-
-
-
-
-
 int removeProcessFromQueue(tProcess* process){
   if(processQueue.processAmount <= 0 || process->pid < 0){
     return -1;

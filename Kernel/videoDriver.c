@@ -40,6 +40,9 @@ struct vesa_mode {
 	uint8_t reserved1[206];
 } __attribute__ ((packed));
 
+
+	int localx = 0;
+	int localy = 0;
 	struct vesa_mode * screen = (struct vesa_mode*)0x0000000000005C00;
 	struct RGB backup[1050][950];
 
@@ -161,10 +164,19 @@ struct vesa_mode {
 	    }
 	  }
 
-	  void writeString(char* string, uint64_t x, uint64_t y, uint64_t size){
+	  void writeString(char* string){
+	    struct RGB black = {0,0,0};
 	    while(*string != 0){
-	      writeChar(*string,x,y,size);
-	      x += (CHAR_WIDTH + 1) * size;
+	      writeChar(*string,localx,localy,1);
+	      localx += (CHAR_WIDTH + 1);
+	      if(localx >= screen->width) {
+	      	localx = 0;
+	      	localy += CHAR_HEIGHT + 1;
+	      	if(localy >= screen->height) {
+	      		movePixelsUp(CHAR_HEIGHT + 1, black);
+				localy -= CHAR_HEIGHT + 1;
+	      	}
+	      }
 	      string++;
 	    }
 	  }
