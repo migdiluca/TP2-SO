@@ -219,8 +219,22 @@ int unlink(sem_t * sem) {
         return -1;
     freeMemoryPidLists(sem->waitListStart);
     freeMemoryPidLists(sem->usedBy);
+    if(sem->value > 0)
+        semList = unlinkR(semList, sem->id);
+    else
+        mutexList = unlinkR(mutexList, sem->id);
     freeMemory(sem);
     return 0;
+}
+
+sem_t * unlinkR(sem_t * sem, int id) {
+    if(sem == NULL)
+        return NULL;
+    if(sem->id == id) {
+        return sem->next;
+    }
+    sem->next = unlinkR(sem->next,id);
+    return sem;
 }
 
 int exists(sem_t * sem) {
