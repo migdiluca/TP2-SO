@@ -40,7 +40,7 @@ void _blockProcess(uint64_t pid);
 void _unBlockProcess(uint64_t pid);
 uint64_t _mallocMemory(uint64_t size);
 uint64_t _callocMemory(uint64_t size);
-uint64_t _reallocMemory(uint64_t size);
+uint64_t _reallocMemory(uint64_t addr, uint64_t size);
 void _freeMemory(uint64_t addr);
 
 #endif

@@ -6,7 +6,7 @@
 #include <lib.h>
 #include <soundDriver.h>
 #include "BuddyAllocationSystem.h"
-#include "processh"
+#include "process.h"
 #include "scheduler.h"
 
 typedef uint64_t(*systemCall)();
@@ -120,7 +120,7 @@ void _fillScreen(struct RGB color) {
 }
 
 uint64_t _createProcess(char * processName, void * startingPoint, int argc, char* argv[]) {
-    tProcess * proc = createProcess(processName, startingPoint, 0, argc, argv[]);
+    tProcess * proc = createProcess(processName, startingPoint, 0, argc, argv);
     addProcess(proc);
     return proc->pid;
 }
@@ -130,11 +130,11 @@ void _endProcess() {
 }
 
 void _blockProcess(uint64_t pid) {
-    blockProcess(int pid);
+    blockProcess(pid);
 }
 
 void _unBlockProcess(uint64_t pid) {
-    unblockProcess(int pid);
+    unblockProcess(pid);
 }
 
 uint64_t _mallocMemory(uint64_t size) {
@@ -145,8 +145,8 @@ uint64_t _callocMemory(uint64_t size) {
     return callocMemory(size);
 }
 
-uint64_t _reallocMemory(uint64_t size) {
-    return reallocMemory(size);
+uint64_t _reallocMemory(uint64_t addr, uint64_t size) {
+    return reallocMemory(addr, size);
 }
 
 void _freeMemory(uint64_t addr) {
