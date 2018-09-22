@@ -44,7 +44,7 @@ struct vesa_mode {
 	int localx = 0;
 	int localy = 0;
 	struct vesa_mode * screen = (struct vesa_mode*)0x0000000000005C00;
-	struct RGB backup[1050][950];
+	//struct RGB backup[1050][950];
 
 	uint64_t getWidth(){
 		return screen->width;
@@ -115,19 +115,19 @@ struct vesa_mode {
 	}
 
 	void backupScreen() {
-		for(int i = 0; i < screen->width; i++) {
-			for(int j= 0; j< screen->height; j++){
-				backup[i][j] = readPixel(i,j);
-			}
-		}
+//		for(int i = 0; i < screen->width; i++) {
+//			for(int j= 0; j< screen->height; j++){
+//				backup[i][j] = readPixel(i,j);
+//			}
+//		}
 	}
 
 	void restoreScreen() {
-		for(int j = 0; j < screen->height; j++) {
-			for(int i = 0; i< screen->width; i++){
-				writePixel(i,j,backup[i][j]);
-			}
-		}
+//		for(int j = 0; j < screen->height; j++) {
+//			for(int i = 0; i< screen->width; i++){
+//				writePixel(i,j,backup[i][j]);
+//			}
+//		}
 	}
 
 	void fillScreen(struct RGB color){

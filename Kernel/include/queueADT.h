@@ -28,14 +28,19 @@ void * pop(queueADT q);
 
 /**
  Remueve un elemento (* elem) de la queue (q)
-Se podra utilizar si es que posee una funcion comparadora
+ Se podra utilizar si es que posee una funcion comparadora
  */
-void removeElem(queueADT q, void * elem);
+void * removeElem(queueADT q, void * elem);
 
 /**
  Retorna 1 si un elemento (* elem) pertenece a la queue (q) 0 sino.
  Se podra utilizar si es que posee una funcion comparadora
  */
 int belongsElem(queueADT q, void * elem);
+
+/**
+ Retonra la cantidad de elementos en la cola
+ */
+int getSize(queueADT q);
 
 #endif

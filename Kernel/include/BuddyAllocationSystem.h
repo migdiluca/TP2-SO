@@ -5,8 +5,8 @@
 #include <stdlib.h>
 
 /**
-  Desc: Libera un bloque de memoria (* memoryAdr) que fue previamente alocado por "malloc" asi este es disponible para otro uso.
-  Ret: -
+ Desc: Libera un bloque de memoria (* memoryAdr) que fue previamente alocado por "malloc" asi este es disponible para otro uso.
+ Ret: -
  */
 void freeMemory(void * memoryAdr);
 
@@ -34,5 +34,7 @@ void * callocMemory(size_t request);
  Ret: -
  */
 void dumpMemory();
+
+void put();
 
 #endif /* BuddyAllocationSystem */

@@ -1,12 +1,9 @@
 #include "BuddyAllocationSystem.h"
-
 #define TRUE 1
 #define FALSE 0
-
-#define BUCKET_AMOUNT 26
-#define LEAF_SIZE 16
-
-#define total_size (1<<(BUCKET_AMOUNT-1)) * LEAF_SIZE
+#define BUCKET_AMOUNT 23
+#define LEAF_SIZE 128
+#define total_size (1<<(BUCKET_AMOUNT-1)) * LEAF_SIZE // es como hacer :(1<<30) = 1*(2^30
 #define size_of_level(n) (total_size / (1<<(n)))
 #define max_blocks_of_level(n)  ((1<<(n)))
 #define is_leaf_block(n) ((1 << (BUCKET_AMOUNT - 1)) <= (n)) ? TRUE : FALSE
@@ -14,8 +11,7 @@
 #define move_to_left_child(index) ((index) * 2 + 1)
 #define move_to_right_child(index) ((index) * 2 + 2)
 #define move_to_sibling(index) ((((index) - 1) ^ 1) + 1)
-
-#define array_size(array) (array / 8 + (!! (array % 8)))
+#define array_size(i) (((i) / 8) + (!! ((i) % 8)))
 #define toggle_bit(array, i) (array[i / 8] ^= 1 << (i % 8))
 #define get_bit(array, i) (1 & (array[i / 8] >> (i % 8)))
 
@@ -25,10 +21,10 @@ typedef struct list_t {
 
 static uint8_t * baseAdress;
 extern uint8_t endOfKernel;
+static char splitBlocks[array_size(1 << (BUCKET_AMOUNT - 1))] = {0};
+static char allocatedBlocks[array_size(1 << (BUCKET_AMOUNT))] = {0};
 static list_t * buckets[BUCKET_AMOUNT];
-static char splitBlocks[array_size(1 << (BUCKET_AMOUNT - 1))];
-static char allocatedBlocks[array_size(1 << (BUCKET_AMOUNT))];
-//static char buff[8];
+static char buff[8];
 
 int indexInLevelOf(uint8_t * memoryAdr, int level) {
     return((memoryAdr - baseAdress) >> (29 - level)) + (1 << level) - 1;
@@ -38,10 +34,24 @@ int adress(int index, int level) {
     return baseAdress + ((index - (1 << level) + 1) << (29 - level));
 }
 
+void put() {
+    writeString("size");
+    uintToBase(array_size(1 << (BUCKET_AMOUNT)), buff, 10);
+    writeString(buff);
+    writeString("\n");
+}
+
 void init() {
     baseAdress = (uint8_t *)&endOfKernel;
     list_t * node = (list_t *)baseAdress;
     node->next = NULL;
+    //    putStr("Base adress: ", colour);
+    //    uintToBase(baseAdress, buff, 10);
+    //    putStr(buff, colour);
+    //    putStr(" Total Size: ", colour);
+    //    uintToBase(total_size, buff, 10);
+    //    putStr(buff, colour);
+    //    putChar('\n', colour);
     buckets[0] = node;
 }
 
@@ -148,6 +158,7 @@ void splitBlock(int level) {
     pushList(level+1, adress(move_to_left_child(index), level+1));
 }
 
+// TODO: hay que chequear el rango de la direccion de memoria??
 void freeMemory(void * memoryAdr) {
     if (memoryAdr == NULL) {
         return;
@@ -169,7 +180,7 @@ void freeMemory(void * memoryAdr) {
 
 void * reallocMemory(void * memorySrc, size_t request) {
     int level = findLevel(memorySrc);
-    int size = size_of_level(level);
+    char size = size_of_level(level);
     if (size >= request) {
         return memorySrc;
     }
@@ -190,39 +201,45 @@ void * callocMemory(size_t request) {
 }
 
 void dumpMemory() {
-//    int index = 0;
-//    int level = 0;
-//    int maxIndex = 0;
-//    while (level < BUCKET_AMOUNT) {
-//        maxIndex += max_blocks_of_level(level);
-//        putStr("Level: ", colour);
-//        uintToBase(level, buff, 10);
-//        putStr(buff, colour);
-//        putChar('\n', colour);
-//        while (index < maxIndex) {
-//            uintToBase(index, buff, 10);
-//            putStr(" -- ", colour);
-//            putStr(buff, colour);
-//            if (!is_leaf_block(index)) {
-//                if (get_bit(splitBlocks,index)) {
-//                    putStr(" is Split", colour);
-//                    //putStr(" --", colour);
-//                    //putChar('\n', colour);
-//                    //index++;
-//                    //continue;
-//                }
-//            }
-//            if (get_bit(allocatedBlocks, index)) {
-//                putStr(" is Allocated", colour);
-//            }
-//            else {
-//                putStr(" is Free", colour);
-//            }
-//            index++;
-//        }
-//        putStr(" --", colour);
-//        putChar('\n', colour);
-//        level++;
-//    }
-//    putChar('\n', colour);
+    int index = 0;
+    int level = 0;
+    int maxIndex = 0;
+    while (level < BUCKET_AMOUNT) {
+        maxIndex += max_blocks_of_level(level);
+        writeString("Level: ");
+        uintToBase(level, buff, 10);
+        writeString(buff);
+        writeString("\n");
+        while (index < maxIndex) {
+            //            uintToBase(index, buff, 10);
+            //            putStr(" -- ", colour);
+            //            putStr(buff, colour);
+            if (!is_leaf_block(index)) {
+                if (get_bit(splitBlocks,index)) {
+                    uintToBase(index, buff, 10);
+                    writeString(" -- ");
+                    writeString(buff);
+                    writeString(" is Split");
+                    writeString(" -- \n");
+                    index++;
+                    continue;
+                }
+            }
+            if (get_bit(allocatedBlocks, index)) {
+                uintToBase(index, buff, 10);
+                writeString(" -- ");
+                writeString(buff);
+                writeString(" is Allocated");
+                writeString(" -- \n");
+            }
+            //          else {
+            //            putStr(" is Free", colour);
+            //           }
+            index++;
+        }
+        //        putStr(" --", colour);
+        //        putChar('\n', colour);
+        level++;
+    }
+    writeString("\n");
 }

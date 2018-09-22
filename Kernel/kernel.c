@@ -63,14 +63,13 @@ int main()
 	load_idt();
 	setUpBuffers();
 
-	//probandoEscribirEnKernel();
-
 	instructionPointerBackup = sampleCodeModuleAddress;
 	stackPointerBackup = getStackPointer() + 2*8;
+    
+    init_(sampleCodeModuleAddress);
+    
 	//((EntryPoint)sampleCodeModuleAddress)();
 
-	writeString("hola");
-	writeString("putx los que leen");
 
 
 	return 0;

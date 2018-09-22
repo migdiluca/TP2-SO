@@ -5,6 +5,7 @@ GLOBAL picMasterMask
 GLOBAL picSlaveMask
 GLOBAL haltcpu
 GLOBAL _hlt
+GLOBAL contextSwitch
 
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
@@ -28,44 +29,45 @@ EXTERN main
 EXTERN dispatcher
 
 SECTION .text
+
 %macro pushaq 0
-	push rax
-	push rbx
-	push rcx
-	push rdx
-	push rbp
-	push rdi
-	push rsi
-	push r8
-	push r9
-	push r10
-	push r11
-	push r12
-	push r13
-	push r14
-	push r15
-	push fs
-	push gs
+push rax
+push rbx
+push rcx
+push rdx
+push rbp
+push rdi
+push rsi
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
+push fs
+push gs
 %endmacro
 
 %macro popaq 0
-	pop gs
-	pop fs
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop rsi
-	pop rdi
-	pop rbp
-	pop rdx
-	pop rcx
-	pop rbx
-	pop rax
+pop gs
+pop fs
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+pop rsi
+pop rdi
+pop rbp
+pop rdx
+pop rcx
+pop rbx
+pop rax
 %endmacro
 
 
@@ -177,28 +179,20 @@ _exception6Handler:
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:
-irqHandlerMaster 0
+ pushaq
 
+   mov rdi, rsp
+   call dispatcher
+   mov rsp, rax
 
-;	8254 Timer (Timer Tick)
-	;_irq00Handler:
-	;	pushaq
+   popaq
 
-	;	mov rdi, rsp
-	;	call dispatcher
-	;	mov rsp, rax
+    irqHandlerMaster 0
 
-	;	popaq
-
-		;EOI
-	;	mov al, 20h
-	;	out 20h, al
-
-	;	iretq
-
-
-
-
+   ;EOI
+    mov al, 20h
+   out 20h, al
+   iretq
 
 ;Keyboard
 _irq01Handler:
@@ -240,6 +234,11 @@ _syscallHandler:
 	leave
 	iretq
 
+contextSwitch:
+    mov rsp, rdi
+    popaq
+    sti
+    iretq
 
 haltcpu:
 	cli

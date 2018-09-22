@@ -5,18 +5,28 @@
 #include "BuddyAllocationSystem.h"
 #include "lib.h"
 
-#define BLOCK_SIZE 0x1000
+#define BLOCK_SIZE 4096
 #define PROCESS_SIZE 2*BLOCK_SIZE
-typedef enum {START, READY, RUNNING, WAITING, TERMINATED} pState; //estados de un proceso
+typedef enum {READY, RUNNING, WAITING, DEAD} pState; //estados de un proceso
 
 typedef struct{
-  int pid; //process ID
-  int parentPid; //parent's ID
-  char* name; //process name
-  pState state; //process status
-  void* stackPointer;;
-  void* processMemoryLowerAddress;
-}tProcess;
+    int pid; //process ID
+    int parentPid; //parent's ID
+    char* name; //process name
+    pState state; //process status
+    void * stackPointer;
+    void * processMemoryLowerAddress;
+} tProcess;
+
+//typedef struct {
+//    int pid; //process ID
+//    int parentPid; //parent's ID
+//    char * name; //process name
+//    pState state; //process status
+//    void * stackPointer;
+//    void * code;
+//    void * processMemoryLowerAddress;
+//} tProcess;
 
 //RowDaBoat
 typedef struct {
@@ -37,7 +47,7 @@ typedef struct {
     uint64_t rcx;
     uint64_t rbx;
     uint64_t rax;
-
+    
     uint64_t rip;
     uint64_t cs;
     uint64_t eflags;
@@ -49,6 +59,6 @@ typedef struct {
 
 tProcess* createProcess(char* processName,void* startingPoint, int parentPid, int argc, char* argv[]);
 void deleteProcess(tProcess* process);
-void* initializeStack(void* stackPointer, int argc, char* argv[], void* startingPoint);
-
+//void initializeStack(tStackFrame* stackPointer, int argc, char* argv[], void* startingPoint);
+void* initializeStack(void * stackPointer, int argc, char* argv[], void * startingPoint);
 #endif
