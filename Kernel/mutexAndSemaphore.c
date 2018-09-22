@@ -106,10 +106,6 @@ int wait(sem_t * sem){
         (sem->value)--;
         return 0;
     }
-    else if(sem->value == -2) /*si es mutex */{
-        (sem->value)++;
-        return 0;
-    }
     else {
         int currentPid = getRunningPid();
         sem->waitListTail->next = mallocMemory(sizeof(pid_list));
@@ -117,7 +113,12 @@ int wait(sem_t * sem){
         sem->waitListTail->next->next = NULL;
         if(sem->waitListStart == NULL)
             sem->waitListStart = sem->waitListTail;
-        blockProcess(currentPid);
+
+        //Si el mutex esta desbloqeuado (value == -2) no se bloquea
+        if(sem->value != -2)
+            blockProcess(currentPid);
+        else
+            sem->value = -1;
         return 0;
     }
 }
@@ -134,19 +135,23 @@ int post(sem_t * sem) {
 
     pid_list * firstWaiting = sem->waitListStart;
     if(firstWaiting != NULL) {
+        //Si es mutex (value negativo) y hay esta bloqueado entonces me fijo si el que saco corresponde con su pid
+        if(sem->value == -1 && getRunningPid() != firstWaiting->pid)
+            return -1;
         unblockProcess(firstWaiting->pid);
         sem->waitListStart = firstWaiting->next;
         if(sem->waitListStart == NULL)
             sem->waitListTail = NULL;
+        //Si es mutex y no queda nadie entonces lo pongo como desbloqueado (value == -2)
+        if(sem->value == -1 && firstWaiting->next == NULL)
+            sem->value = -2;
         freeMemory(firstWaiting);
+
     }
-    else if(sem->value > 0)
+    else if(sem->value >= 0)
         (sem->value)++;
-    else if(sem->value == -1)
-        (sem->value)--;
-    //TENNDRIA QUE DEVOLVER -1 SI YA ESTA DESBLOQUEADO EL MUTEX?.
-    // NO SE QUE QUISE DECIR ARRIBA DEPUSE VEO
-    return 0;
+
+    return -1;
 }
 
 int getStringID (char * name) {
