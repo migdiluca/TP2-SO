@@ -173,8 +173,9 @@ struct vesa_mode {
 	      	localx = 0;
 	      	localy += CHAR_HEIGHT + 1;
 	      	if(localy >= screen->height) {
-	      		movePixelsUp(CHAR_HEIGHT + 1, black);
+	      		movePixelsUp(CHAR_HEIGHT + 2, black);
 				localy -= CHAR_HEIGHT + 1;
+				localx = 0;
 	      	}
 	      }
 	      string++;

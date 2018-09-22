@@ -4,7 +4,7 @@
 #include "queueADT.h"
 #include <stdint.h>
 #include "lib.h"
-#include <VideoDriver.h>
+#include <videoDriver.h>
 #define MAX_PROCESSES 20
 
 typedef struct processNode{
@@ -12,6 +12,7 @@ typedef struct processNode{
     struct processNode * next;
 } tProcessNode;
 
+int getRunningPid();
 void addProcess(tProcess * p);
 void getFromWaiting();
 void blockProcess(int pid);
