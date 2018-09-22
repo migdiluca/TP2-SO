@@ -34,4 +34,13 @@ void _beep(uint64_t time);
 void _activateBeep();
 void _deactivateBeep();
 
+uint64_t _createProcess(char * processName, void * startingPoint, int argc, char* argv[]);
+void _endProcess();
+void _blockProcess(uint64_t pid);
+void _unBlockProcess(uint64_t pid);
+uint64_t _mallocMemory(uint64_t size);
+uint64_t _callocMemory(uint64_t size);
+uint64_t _reallocMemory(uint64_t size);
+void _freeMemory(uint64_t addr);
+
 #endif

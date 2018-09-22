@@ -5,29 +5,38 @@
 #include "std_buffers.h"
 #include <lib.h>
 #include <soundDriver.h>
-
-
+#include "BuddyAllocationSystem.h"
+#include "processh"
+#include "scheduler.h"
 
 typedef uint64_t(*systemCall)();
 
 systemCall sysCalls[] = { 0, 0, 0,
-  (systemCall)_writePixel,
-  (systemCall)_readPixel,
-  (systemCall)_getScreenWidth,
-  (systemCall)_getScreenHeight,
-  (systemCall)_write,
-  (systemCall)_read,
-  (systemCall)_clearBuffer,
-  (systemCall)_readTime,
-  (systemCall)_scrollScreen,
-  (systemCall)_replaceColor,
-  (systemCall) _backupScreen,
-  (systemCall) _restoreScreen,
-  (systemCall) _fillScreen,
-  (systemCall) _writeBlock,
-  (systemCall) _beep
-  // (systemCall) _activateBeep,
-  // (systemCall) _deactivateBeep
+    (systemCall) _writePixel,
+    (systemCall) _readPixel,
+    (systemCall) _getScreenWidth,
+    (systemCall) _getScreenHeight,
+    (systemCall) _write,
+    (systemCall) _read,
+    (systemCall) _clearBuffer,
+    (systemCall) _readTime,
+    (systemCall) _scrollScreen,
+    (systemCall) _replaceColor,
+    (systemCall) _backupScreen,
+    (systemCall) _restoreScreen,
+    (systemCall) _fillScreen,
+    (systemCall) _writeBlock,
+    (systemCall) _beep,
+    (systemCall) _createProcess,
+    (systemCall) _endProcess,
+    (systemCall) _blockProcess,
+    (systemCall) _unBlockProcess,
+    (systemCall) _mallocMemory,
+    (systemCall) _callocMemory,
+    (systemCall) _reallocMemory,
+    (systemCall) _freeMemory,
+  //(systemCall) _activateBeep,
+  //(systemCall) _deactivateBeep
 };
 
 
@@ -109,3 +118,40 @@ void _restoreScreen(){
 void _fillScreen(struct RGB color) {
   fillScreen(color);
 }
+
+uint64_t _createProcess(char * processName, void * startingPoint, int argc, char* argv[]) {
+    tProcess * proc = createProcess(processName, startingPoint, 0, argc, argv[]);
+    addProcess(proc);
+    return proc->pid;
+}
+
+void _endProcess() {
+    endProcess();
+}
+
+void _blockProcess(uint64_t pid) {
+    blockProcess(int pid);
+}
+
+void _unBlockProcess(uint64_t pid) {
+    unblockProcess(int pid);
+}
+
+uint64_t _mallocMemory(uint64_t size) {
+    return mallocMemory(size);
+}
+
+uint64_t _callocMemory(uint64_t size) {
+    return callocMemory(size);
+}
+
+uint64_t _reallocMemory(uint64_t size) {
+    return reallocMemory(size);
+}
+
+void _freeMemory(uint64_t addr) {
+    freeMemory(addr);
+}
+
+
+

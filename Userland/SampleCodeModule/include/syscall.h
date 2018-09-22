@@ -18,6 +18,14 @@
 #define _writeBlock 16
 #define _beep 17
 #define _unbeep 18
+#define _createProcess 19
+#define _endProcess 20
+#define _blockProcess 21
+#define _unBlockProcess 22
+#define _mallocMemory 23
+#define _callocMemory 24
+#define _reallocMemory 25
+#define _freeMemory 26
 
 uint64_t _syscall(uint64_t, ...);
 

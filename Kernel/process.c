@@ -3,7 +3,7 @@
 char buff2[8];
 static int nextPid = 1; //Esta variable le asigna a cada proceso un pid distinto
 
-tProcess* createProcess(char* processName,void* startingPoint, int parentPid, int argc, char* argv[]){
+tProcess* createProcess(char* processName,void* startingPoint, int parentPid, int argc, char* argv[]) {
     /*Se reserva espacio para la estructura del proceso*/
     tProcess* process = mallocMemory(sizeof(tProcess));
     
@@ -160,7 +160,7 @@ void printProcess(tProcess * p) {
 
 // implementar yield para pasar a un proceso de ruuning a ready/waiting asi darle timepo a otro sin que este sea interrumpido por el timer tick
 
-void endProcess() {
+void endProcess() { // sacar cli ya que sera una syscall nadie me interrumpe
     _cli();
     changeProcessState(getRunningPid(), DEAD);
     _hlt();
