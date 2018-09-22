@@ -42,22 +42,21 @@ sem_t * sem_open(char * name, int flag, int initialValue) {
     if(newSem == null)
         return null;
 
-    newSem->id = getStringID(name);
-    newSem->value = initialValue;
-
-    sem_t * sem = getSem(newSem->id);
-    if(flag == O_EXCL && sem != null){
-        free(newSem);
+    sem_t * searchedSem = getSem(getStringID(name));
+    if(sem != null) {
+        if(flag != O_EXCL)
+            return searchedSem;
         return null;
     }
-    else if(sem != null)
-        return sem;
-    else {
-        newSem->next = semList;
-        semList = newSem;
-        newSem->waitListStart = null;
-        newSem->waitListTail = null;
-    }
+
+    newSem->id = getStringID(name);
+    newSem->value = initialValue;
+    newSem->next = semList;
+    semList = newSem;
+    newSem->waitListStart = null;
+    newSem->waitListTail = null;
+
+    return newSem
 }
 
 /**
