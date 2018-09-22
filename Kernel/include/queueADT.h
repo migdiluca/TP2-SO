@@ -4,7 +4,23 @@
 #include "BuddyAllocationSystem.h"
 #include "lib.h"
 
-typedef struct queueCDT * queueADT;
+
+typedef struct TNode {
+    struct TNode * next;
+    void * elem;
+} TNode;
+
+typedef struct queueCDT {
+    size_t bytes;
+    int (*cmp)(void *, void *);
+    TNode * last;
+    TNode * first;
+    int dim;
+} queueCDT;
+
+typedef queueCDT* queueADT;
+
+//typedef struct queueCDT * queueADT;
 
 /**
  Creaa una queue genericas de elementos de tamañ bytes y recive una funciona coparadora (con esta queue podemos uitlizar las funciones belongs y remove) si no se va a utilizar pasar NULL
@@ -42,5 +58,8 @@ int belongsElem(queueADT q, void * elem);
  Retonra la cantidad de elementos en la cola
  */
 int getSize(queueADT q);
+
+
+
 
 #endif

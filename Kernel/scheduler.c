@@ -21,7 +21,7 @@ void probandoEscribirEnKernel2() {
         writeString(" Cosa ");
         i++;
     }
-    endProcess();
+    endProcess(getRunningPid());
 }
 
 void probandoEscribirEnKernel5() {
@@ -33,7 +33,7 @@ void probandoEscribirEnKernel5() {
         writeString("\n");
         i++;
     }
-    endProcess();
+    endProcess(getRunningPid());
 }
 
 void probandoEscribirEnKernel4() {
@@ -44,7 +44,7 @@ void probandoEscribirEnKernel4() {
         writeString("Hola");
         i++;
     }
-    endProcess();
+    endProcess(getRunningPid());
 }
 
 void probandoEscribirEnKernel3() {
@@ -54,7 +54,7 @@ void probandoEscribirEnKernel3() {
         i++;
     }
     unblockProcess(3);
-    endProcess();
+    endProcess(getRunningPid());
 }
 void probandoEscribirEnKernel() {
     int i = 0;
@@ -66,11 +66,15 @@ void probandoEscribirEnKernel() {
     while(1) {
         writeString(" Genere ");
     }
-    endProcess();
+    endProcess(getRunningPid());
 }
 
 int getRunningPid() {
     return (running == NULL ) ? -1 : running->pid;
+}
+
+void* getRunningProcess(){
+  return running;
 }
 
 void addProcess(tProcess * p) {
@@ -102,13 +106,13 @@ void unblockProcess(int pid) {
 changeProcessState(int pid, pState state) {
     if (running->pid == pid) {
         running->state = state;
-        
+
         writeString("\n");
         writeString("RunningDead Pid:");
         uintToBase(getRunningPid(), buff, 10);
         writeString(buff);
         writeString("\n");
-        
+
         return;
     }
     //TODO: esta parte del codigo jamas fue testada, nose si se usara en algun caso mucho sentido no tiene
@@ -187,19 +191,19 @@ int cmpProcess(tProcess * p1, tProcess * p2) {
 void init_Process() {
     tProcess * proc = createProcess("maite capa", probandoEscribirEnKernel, 0, 0, NULL);
     printProcess(proc);
-    
+
     tProcess * anotherP = createProcess("fer0", probandoEscribirEnKernel2, 0, 0, NULL);
     printProcess(anotherP);
-    
+
     tProcess * anotherP1 = createProcess("fer1", probandoEscribirEnKernel3, 0, 0, NULL);
     printProcess(anotherP1);
-    
+
     dumpMemory();
-    
+
     push(ready, proc);
     push(ready, anotherP);
     push(ready, anotherP1);
-    
+
     probandoEscribirEnKernel4();
     //endProcess();
 }

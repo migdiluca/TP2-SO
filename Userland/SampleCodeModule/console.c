@@ -17,7 +17,7 @@
 #define GREEN 4
 #define YELLOW 5
 
-
+int probando();
 
 char buffer[20000];
 int bufferIndex = 0;
@@ -52,9 +52,16 @@ void init(){
   printf("Welcome to MikeOS. To get started, type man to check the different programs.");
 }
 
+int probando(){
+  printf("ENTROOOOOOOOOOO");
+}
+
+
 void consoleLoop(){
+
   stdout();
   stderr();
+
   while(1){
     stdin();
     stdout();

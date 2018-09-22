@@ -26,7 +26,7 @@ systemCall sysCalls[] = { 0, 0, 0,
     (systemCall) _restoreScreen,
     (systemCall) _fillScreen,
     (systemCall) _writeBlock,
-    (systemCall) _beep,
+    (systemCall) _beep, 0, //ESTE 0 ES DE UNBEEP. PREGUNTAR Q ONDA
     (systemCall) _createProcess,
     (systemCall) _endProcess,
     (systemCall) _blockProcess,
@@ -35,6 +35,8 @@ systemCall sysCalls[] = { 0, 0, 0,
     (systemCall) _callocMemory,
     (systemCall) _reallocMemory,
     (systemCall) _freeMemory,
+    (systemCall) _exec,
+    (systemCall) _kill,
   //(systemCall) _activateBeep,
   //(systemCall) _deactivateBeep
 };
@@ -126,7 +128,7 @@ uint64_t _createProcess(char * processName, void * startingPoint, int argc, char
 }
 
 void _endProcess() {
-    endProcess();
+    //endProcess();
 }
 
 void _blockProcess(uint64_t pid) {
@@ -137,8 +139,8 @@ void _unBlockProcess(uint64_t pid) {
     unblockProcess(pid);
 }
 
-uint64_t _mallocMemory(uint64_t size) {
-    return mallocMemory(size);
+uint64_t _mallocMemory(uint64_t size, uint64_t address) {
+    return (uint64_t) mallocMemoryInProcess(size, getRunningProcess());
 }
 
 uint64_t _callocMemory(uint64_t size) {
@@ -150,8 +152,27 @@ uint64_t _reallocMemory(uint64_t addr, uint64_t size) {
 }
 
 void _freeMemory(uint64_t addr) {
-    freeMemory(addr);
+    freeMemoryInProcess(addr, getRunningProcess());
+}
+
+void _exec(void* startingPoint, void* pid, int cargs, void ** pargs){
+    int* p = (int*)pid;
+    tProcess* process = createProcess("default", startingPoint, 0, cargs, pargs);//volar parent pid
+    addProcess(process);
+    *p = process->pid;
 }
 
 
-
+void _kill(int pid, int message){
+  switch(message){
+    case 0:
+      endProcess(pid);
+    break;
+    case 1:
+      blockProcess(pid);
+    break;
+    case 2:
+      unblockProcess(pid);
+    break;
+  }
+}
