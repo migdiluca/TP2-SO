@@ -3,6 +3,7 @@
 #include <mutexAndSemaphore.h>
 #include <scheduler.h>
 #include <BuddyAllocationSystem.h>
+#include <testAndSet.h>
 
 struct pid_list {
     int pid;
@@ -14,14 +15,16 @@ struct pid_list {
 struct sem_t {
     int value;
     int id;
+    qword used;
     pid_list * usedBy;
     pid_list * waitListStart;
     pid_list * waitListTail;
     struct sem_t * next;
 } ;
 
-sem_t * semList = NULL;
-mutex_t * mutexList = NULL;
+static qword schedulerMutex=0;
+static sem_t * semList = NULL;
+static mutex_t * mutexList = NULL;
 
 sem_t * sem_open(char * name, int flag, int initialValue) {
     return semAndMutexOpen(name,flag, initialValue, 1);
@@ -39,6 +42,7 @@ mutex_t * mutex_open(char * name) {
  * @return
  */
 sem_t * semAndMutexOpen(char * name, int flag, int initialValue, int isSemaphore) {
+    int notPreviouslyLocked=lockScheduler();
     if(name == NULL || (isSemaphore && initialValue < 0))
         return NULL;
 
@@ -51,14 +55,19 @@ sem_t * semAndMutexOpen(char * name, int flag, int initialValue, int isSemaphore
         searchedSemOrMutex = getMutex(nameID);
 
     if(searchedSemOrMutex != NULL) {
-        if(flag != O_EXCL)
+        if(flag != O_EXCL) {
+            if(notPreviouslyLocked) unlockScheduler();
             return searchedSemOrMutex;
+        }
+        if(notPreviouslyLocked) unlockScheduler();
         return NULL;
     }
 
     sem_t * newSemOrMutex = mallocMemory(sizeof(sem_t));
-    if(newSemOrMutex == NULL)
+    if(newSemOrMutex == NULL) {
+        if(notPreviouslyLocked) unlockScheduler();
         return NULL;
+    }
 
     newSemOrMutex->id = nameID;
     newSemOrMutex->value = initialValue;
@@ -73,7 +82,7 @@ sem_t * semAndMutexOpen(char * name, int flag, int initialValue, int isSemaphore
         newSemOrMutex->next = mutexList;
         mutexList = newSemOrMutex;
     }
-
+    if(notPreviouslyLocked) unlockScheduler();
     return newSemOrMutex;
 }
 
@@ -102,25 +111,35 @@ int trywait(sem_t * sem) {
 int wait(sem_t * sem){
     if(!exists(sem))
         return -1;
-    if(sem->value > 0) {
-        (sem->value)--;
-        return 0;
-    }
-    else {
-        int currentPid = getRunningPid();
-        sem->waitListTail->next = mallocMemory(sizeof(pid_list));
-        sem->waitListTail->next->pid = currentPid;
-        sem->waitListTail->next->next = NULL;
-        if(sem->waitListStart == NULL)
-            sem->waitListStart = sem->waitListTail;
 
-        //Si el mutex esta desbloqeuado (value == -2) no se bloquea
-        if(sem->value != -2)
-            blockProcess(currentPid);
-        else
-            sem->value = -1;
-        return 0;
+    int notPreviouslyLocked=lockScheduler();
+
+
+    if (! testAndSet(&(sem->used)) ) {
+        if(sem->value > 0) {
+            (sem->value)--;
+            if(notPreviouslyLocked) unlockScheduler();
+            return 0;
+        }
+        else {
+            int currentPid = getRunningPid();
+            sem->waitListTail->next = mallocMemory(sizeof(pid_list));
+            sem->waitListTail->next->pid = currentPid;
+            sem->waitListTail->next->next = NULL;
+            if(sem->waitListStart == NULL)
+                sem->waitListStart = sem->waitListTail;
+
+            //Si el mutex esta desbloqeuado (value == -2) no se bloquea
+            if(sem->value != -2)
+                blockProcess(currentPid);
+            else
+                sem->value = -1;
+        }
     }
+
+    if(notPreviouslyLocked) unlockScheduler();
+    return 0;
+
 }
 
 /**
@@ -133,25 +152,36 @@ int post(sem_t * sem) {
     if(!exists(sem))
         return -1;
 
-    pid_list * firstWaiting = sem->waitListStart;
-    if(firstWaiting != NULL) {
-        //Si es mutex (value negativo) y hay esta bloqueado entonces me fijo si el que saco corresponde con su pid
-        if(sem->value == -1 && getRunningPid() != firstWaiting->pid)
+    int notPreviouslyLocked=lockScheduler();
+
+    if(! testAndSet(&(sem->used)) ) {
+
+        pid_list *firstWaiting = sem->waitListStart;
+        if (firstWaiting != NULL) {
+            //Si es mutex (value negativo) y hay esta bloqueado entonces me fijo si el que saco corresponde con su pid
+            if (sem->value == -1 && getRunningPid() != firstWaiting->pid) {
+                if (notPreviouslyLocked) unlockScheduler();
+                return -1;
+            }
+            unblockProcess(firstWaiting->pid);
+            sem->waitListStart = firstWaiting->next;
+            if (sem->waitListStart == NULL)
+                sem->waitListTail = NULL;
+            //Si es mutex y no queda nadie entonces lo pongo como desbloqueado (value == -2)
+            if (sem->value == -1 && firstWaiting->next == NULL)
+                sem->value = -2;
+            freeMemory(firstWaiting);
+
+        } else if (sem->value >= 0)
+            (sem->value)++;
+        else if (sem->value == -2) {
+            if (notPreviouslyLocked) unlockScheduler();
             return -1;
-        unblockProcess(firstWaiting->pid);
-        sem->waitListStart = firstWaiting->next;
-        if(sem->waitListStart == NULL)
-            sem->waitListTail = NULL;
-        //Si es mutex y no queda nadie entonces lo pongo como desbloqueado (value == -2)
-        if(sem->value == -1 && firstWaiting->next == NULL)
-            sem->value = -2;
-        freeMemory(firstWaiting);
-
+        }
     }
-    else if(sem->value >= 0)
-        (sem->value)++;
 
-    return -1;
+    if(notPreviouslyLocked) unlockScheduler();
+    return 0;
 }
 
 int getStringID (char * name) {
@@ -254,3 +284,10 @@ int exists(sem_t * sem) {
     return 1;
 }
 
+int lockScheduler(){
+    return testAndSet(&schedulerMutex);
+}
+
+void unlockScheduler(){
+    schedulerMutex=0;
+}
