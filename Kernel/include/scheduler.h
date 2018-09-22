@@ -24,5 +24,6 @@ void * dispatcher(int rsp);
 void init_Process();
 void init_(void * startingPoint);
 int cmpProcess(tProcess * p1, tProcess * p2);
+void* getRunningProcess();
 
 #endif

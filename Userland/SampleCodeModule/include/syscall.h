@@ -26,6 +26,8 @@
 #define _callocMemory 24
 #define _reallocMemory 25
 #define _freeMemory 26
+#define _exec 27
+#define _kill 28
 
 uint64_t _syscall(uint64_t, ...);
 

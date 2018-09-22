@@ -4,6 +4,8 @@
 #include "stdint.h"
 #include "BuddyAllocationSystem.h"
 #include "lib.h"
+#include "queueADT.h"
+
 
 #define BLOCK_SIZE 4096
 #define PROCESS_SIZE 2*BLOCK_SIZE
@@ -16,6 +18,7 @@ typedef struct{
     pState state; //process status
     void * stackPointer;
     void * processMemoryLowerAddress;
+    queueADT heap;
 } tProcess;
 
 //typedef struct {
@@ -47,7 +50,7 @@ typedef struct {
     uint64_t rcx;
     uint64_t rbx;
     uint64_t rax;
-    
+
     uint64_t rip;
     uint64_t cs;
     uint64_t eflags;
@@ -61,4 +64,11 @@ tProcess* createProcess(char* processName,void* startingPoint, int parentPid, in
 void deleteProcess(tProcess* process);
 //void initializeStack(tStackFrame* stackPointer, int argc, char* argv[], void* startingPoint);
 void* initializeStack(void * stackPointer, int argc, char* argv[], void * startingPoint);
+void* mallocMemoryInProcess(size_t bytes, tProcess* process);
+int cmpPointers(uint64_t  p1, uint64_t  p2);
+void freeMemoryInProcess(void* addr ,tProcess* process);
+void freeProcessHeap(queueADT heap);
+void endProcess(int pid) ;
+
+
 #endif

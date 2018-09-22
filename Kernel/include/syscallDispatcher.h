@@ -38,9 +38,10 @@ uint64_t _createProcess(char * processName, void * startingPoint, int argc, char
 void _endProcess();
 void _blockProcess(uint64_t pid);
 void _unBlockProcess(uint64_t pid);
-uint64_t _mallocMemory(uint64_t size);
+uint64_t _mallocMemory(uint64_t size, uint64_t address);
 uint64_t _callocMemory(uint64_t size);
 uint64_t _reallocMemory(uint64_t addr, uint64_t size);
 void _freeMemory(uint64_t addr);
-
+void _exec(void* startingPoint, void* pid, int cargs, void ** pargs);
+void _kill(int pid, int message);
 #endif

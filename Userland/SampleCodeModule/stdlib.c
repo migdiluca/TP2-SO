@@ -68,3 +68,24 @@ void clockString(char * clockTime){
         clockTime[5] = ':';
 		clockTime[8] = '\0';
 }
+
+void* malloc(int bytes){
+    void* address;
+		_syscall(_mallocMemory, bytes, &address);
+    return address;
+}
+
+void free(void* address){
+	_syscall(_freeMemory, address);
+}
+
+int exec(void* startingPoint, int cargs, void ** pargs){// los ultimos dos argumentos reveer
+  int pid;
+//	printf("entro1");
+	_syscall(_exec, startingPoint, &pid, cargs, pargs );
+  return pid;
+}
+
+void kill(int pid, int msg){
+	_syscall(_kill, pid, msg);
+}

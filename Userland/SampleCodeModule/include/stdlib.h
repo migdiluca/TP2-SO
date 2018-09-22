@@ -8,4 +8,11 @@ char * intToChar(int value,int base,char * buffer);
 // Recibe un char * (minimo con 8 lugares) y escribe el reloj para poder imprimirlo adecuadamente.
 void clockString(char * clockTime);
 
+void* malloc(int bytes);
+
+void free(void* address);
+int exec(void* startingPoint, int cargs, void ** pargs);
+void kill(int pid, int msg);
+
+
 #endif

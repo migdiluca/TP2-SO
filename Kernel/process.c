@@ -6,7 +6,7 @@ static int nextPid = 1; //Esta variable le asigna a cada proceso un pid distinto
 tProcess* createProcess(char* processName,void* startingPoint, int parentPid, int argc, char* argv[]) {
     /*Se reserva espacio para la estructura del proceso*/
     tProcess* process = mallocMemory(sizeof(tProcess));
-    
+
     /*Se completan los campos del nuevo proceso*/
     process->pid = nextPid++;
     process->parentPid = parentPid;
@@ -15,6 +15,7 @@ tProcess* createProcess(char* processName,void* startingPoint, int parentPid, in
     void* processMemoryUpperAddress = process->processMemoryLowerAddress + PROCESS_SIZE -1;
     process->stackPointer = initializeStack(processMemoryUpperAddress - sizeof(tStackFrame) +1 , argc, argv, startingPoint);
     process->state = READY;
+    process->heap = NULL;
     return process;
 }
 
@@ -103,17 +104,17 @@ void printStackFrame(tStackFrame * stackFrame) {
     uintToBase(stackFrame->rsi, buff2, 10);
     writeString(buff2);
     writeString("\n");
-    
+
     writeString(" rdi: ");
     uintToBase(stackFrame->rdi, buff2, 10);
     writeString(buff2);
     writeString("\n");
-    
+
     writeString(" rip: ");
     uintToBase(stackFrame->rip, buff2, 10);
     writeString(buff2);
     writeString("\n");
-    
+
     writeString(" rsp: ");
     uintToBase(stackFrame->rsp, buff2, 10);
     writeString(buff2);
@@ -149,25 +150,55 @@ void printProcess(tProcess * p) {
     uintToBase(p->stackPointer, buff2, 10);
     writeString(buff2);
     writeString("\n");
-    
+
     writeString("memory low: ");
     uintToBase(p->processMemoryLowerAddress, buff2, 10);
     writeString(buff2);
     writeString("\n");
-    
+
     printStackFrame(p->stackPointer);
 }
 
 // implementar yield para pasar a un proceso de ruuning a ready/waiting asi darle timepo a otro sin que este sea interrumpido por el timer tick
 
-void endProcess() { // sacar cli ya que sera una syscall nadie me interrumpe
+void endProcess(int pid) { // sacar cli ya que sera una syscall nadie me interrumpe
     _cli();
-    changeProcessState(getRunningPid(), DEAD);
+    changeProcessState(pid, DEAD);
     _hlt();
     //runNextProcess();
 }
 
+
+
 void deleteProcess(tProcess* process) {
     freeMemory(process->processMemoryLowerAddress);
+    freeProcessHeap(process->heap);
     freeMemory(process);
+}
+
+
+void* mallocMemoryInProcess(size_t bytes, tProcess* process){
+  void* p = mallocMemory(bytes);
+  if(process->heap == NULL){
+      process->heap = newQueue(sizeof(void*), cmpPointers);
+  }
+  insertInOrder(process->heap, p);
+return p;
+}
+
+int cmpPointers(uint64_t  p1, uint64_t  p2) {
+    return p1 - p2;
+}
+
+void freeMemoryInProcess(void* addr ,tProcess* process){
+  removeElem(process->heap, addr);
+  freeMemory(addr);
+}
+
+
+
+void freeProcessHeap(queueADT heap){
+  while(heap!=NULL && (heap->dim > 0)){
+    freeMemory(pop(heap)); //libera lo q quedo reservado y sin liberar y tamb el pop va borrando los nodos de la cola
+  }
 }
