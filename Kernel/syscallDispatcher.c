@@ -37,6 +37,9 @@ systemCall sysCalls[] = { 0, 0, 0,
     (systemCall) _freeMemory,
     (systemCall) _exec,
     (systemCall) _kill,
+    (systemCall) _killCurrentProcess,
+    (systemCall) _psProcess,
+
   //(systemCall) _activateBeep,
   //(systemCall) _deactivateBeep
 };
@@ -175,4 +178,12 @@ void _kill(int pid, int message){
       unblockProcess(pid);
     break;
   }
+}
+
+void _killCurrentProcess(){
+  endProcess(getRunningPid());
+}
+
+void _psProcess(char* buffer, int size){
+  sprintProcesses(buffer, size);
 }

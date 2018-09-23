@@ -202,3 +202,20 @@ void freeProcessHeap(queueADT heap){
     freeMemory(pop(heap)); //libera lo q quedo reservado y sin liberar y tamb el pop va borrando los nodos de la cola
   }
 }
+
+int stateToString(char* st, pState state, int buffSize){
+  int ret;
+  if(state == READY){
+     ret = strcpy2(st, "ready\n",buffSize);
+  }
+  else if(state == RUNNING){
+    ret = strcpy2(st, "running\n",buffSize) ;
+  }
+  else if(state == WAITING){
+    ret = strcpy2(st, "waiting\n",buffSize );
+  }
+  else if(state == DEAD){
+    ret = strcpy2(st, "dead\n", buffSize);
+  }
+return ret;
+}

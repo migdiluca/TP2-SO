@@ -81,11 +81,15 @@ void free(void* address){
 
 int exec(void* startingPoint, int cargs, void ** pargs){// los ultimos dos argumentos reveer
   int pid;
-//	printf("entro1");
 	_syscall(_exec, startingPoint, &pid, cargs, pargs );
   return pid;
 }
 
 void kill(int pid, int msg){
 	_syscall(_kill, pid, msg);
+}
+
+//ends current process
+void killCurrentProcess(){
+  _syscall(_killCurrentProcess);
 }

@@ -299,3 +299,69 @@ void init_(void * startingPoint) {
 //    return running->process->stackPointer;
 //}
 //
+
+void sprintProcesses(char* buffer, int buffSize){
+  TNode* aux;
+  int index = 0;
+  int occ;
+  char pid[0];
+  char* state = mallocMemory(8);
+
+    intToString(pid, running->pid);
+    occ = strcpy2(buffer + index, pid, buffSize);
+    index += occ;
+    buffSize -= occ;
+     occ = strcpy2(buffer+index,"     ",buffSize);
+     index+=occ;
+     buffSize-=occ;
+    stateToString(state, running->state, buffSize);
+    occ = strcpy2(buffer+index, state, buffSize);
+    index+=occ;
+    buffSize-=occ;
+
+    if(ready != NULL){
+        aux = ready->first;
+        while(aux!= NULL){
+          tProcess* p = aux->elem;
+          intToString(pid, p->pid);
+          occ = strcpy2(buffer + index, pid, buffSize);
+          index += occ;
+          buffSize -= occ;
+          if(buffSize<=0) break;
+           occ = strcpy2(buffer+index,"     ",buffSize);
+           index+=occ;
+           buffSize-=occ;
+           if(buffSize<=0) break;
+           stateToString(state, p>state, buffSize);
+           occ = strcpy2(buffer+index, state, buffSize);
+           index+=occ;
+           buffSize-=occ;
+           if(buffSize<=0) break;
+           aux = aux->next;
+        }
+
+  }
+  if(blocked != NULL){
+     aux = blocked->first;
+     while(aux!= NULL){
+       tProcess* p = aux->elem;
+       intToString(pid, p->pid);
+       occ = strcpy2(buffer + index, pid, buffSize);
+       index += occ;
+       buffSize -= occ;
+       if(buffSize<=0) break;
+        occ = strcpy2(buffer+index,"     ",buffSize);
+        index+=occ;
+        buffSize-=occ;
+        if(buffSize<=0) break;
+        stateToString(state, p>state, buffSize);
+        occ = strcpy2(buffer+index, state, buffSize);
+        index+=occ;
+        buffSize-=occ;
+        if(buffSize<=0) break;
+        aux = aux->next;
+     }
+}
+
+freeMemory(state);
+}

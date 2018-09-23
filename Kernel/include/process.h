@@ -69,6 +69,6 @@ int cmpPointers(uint64_t  p1, uint64_t  p2);
 void freeMemoryInProcess(void* addr ,tProcess* process);
 void freeProcessHeap(queueADT heap);
 void endProcess(int pid) ;
-
+int stateToString(char* st, pState state, int buffSize);
 
 #endif

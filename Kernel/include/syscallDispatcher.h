@@ -44,4 +44,6 @@ uint64_t _reallocMemory(uint64_t addr, uint64_t size);
 void _freeMemory(uint64_t addr);
 void _exec(void* startingPoint, void* pid, int cargs, void ** pargs);
 void _kill(int pid, int message);
+void _killCurrentProcess();
+void _psProcess(char* buffer, int size);
 #endif

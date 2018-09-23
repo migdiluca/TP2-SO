@@ -28,6 +28,8 @@
 #define _freeMemory 26
 #define _exec 27
 #define _kill 28
+#define _killCurrentProcess 29
+#define _psProcess 30
 
 uint64_t _syscall(uint64_t, ...);
 

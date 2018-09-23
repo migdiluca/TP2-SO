@@ -25,5 +25,6 @@ void init_Process();
 void init_(void * startingPoint);
 int cmpProcess(tProcess * p1, tProcess * p2);
 void* getRunningProcess();
+void sprintProcesses(char* buffer, int buffSize);
 
 #endif
