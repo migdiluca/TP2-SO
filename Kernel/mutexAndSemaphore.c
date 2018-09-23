@@ -115,10 +115,7 @@ int wait(sem_t * sem){
 
     if(sem->value > 0) {
         (sem->value)--;
-        if(getSize(sem->waitAccessQueue)==0)
-            sem->used = 0;
-        else
-            unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
+        unlockTas(sem);
         return 0;
     }
     else {
@@ -131,10 +128,7 @@ int wait(sem_t * sem){
         else
             sem->value = -1;
 
-        if(getSize(sem->waitAccessQueue)==0)
-            sem->used = 0;
-        else
-            unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
+        unlockTas(sem);
         return 0;
     }
 
@@ -160,27 +154,30 @@ int post(sem_t * sem) {
     if(firstWaitingPid != NULL) {
         //Si es mutex (value negativo) y hay esta bloqueado entonces me fijo si el que saco corresponde con su pid
         if(sem->value == -1 && getRunningPid() != *firstWaitingPid) {
-            if(getSize(sem->waitAccessQueue)==0)
-                sem->used = 0;
-            else
-                unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
+            unlockTas(sem);
             return -1;
         }
         //Si es mutex y no queda nadie entonces lo pongo como desbloqueado (value == -2)
-        if(sem->value == -1 && getSize(sem->blockedQueue) == 0)
+        if(sem->value == -1 && getSize(sem->blockedQueue) == 0) {
             sem->value = -2;
-        
+            unlockTas(sem);
+            return 0;
+        }
         unblockProcess(*firstWaitingPid);
     }
     else if(sem->value >= 0)
         (sem->value)++;
 
+    unlockTas(sem);
+
+    return 0;
+}
+
+void unlockTas(sem_t * sem){
     if(getSize(sem->waitAccessQueue)==0)
         sem->used = 0;
     else
         unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
-
-    return 0;
 }
 
 int getStringID (char * name) {

@@ -22,4 +22,5 @@ int close(sem_t * sem);
 int unlink(sem_t * sem);
 sem_t * unlinkR(sem_t * sem, int id);
 int exists(sem_t * sem);
-int cmp(int * pid1, int * pid2);
+int cmp(int * pid1, int  * pid2);
+void unlockTas(sem_t * sem);
