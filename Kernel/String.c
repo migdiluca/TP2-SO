@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include "String.h"
 
 int strcpy2(char* str1, const char* str2, int length);
 void intToString(char* str, int num);

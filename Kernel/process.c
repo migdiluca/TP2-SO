@@ -203,19 +203,16 @@ void freeProcessHeap(queueADT heap){
   }
 }
 
-int stateToString(char* st, pState state, int buffSize){
-  int ret;
+int stateIdentifier(pState state){
   if(state == READY){
-     ret = strcpy2(st, "ready\n",buffSize);
+     return 0;
   }
   else if(state == RUNNING){
-    ret = strcpy2(st, "running\n",buffSize) ;
+    return 1;
   }
   else if(state == WAITING){
-    ret = strcpy2(st, "waiting\n",buffSize );
+    return 2;
   }
-  else if(state == DEAD){
-    ret = strcpy2(st, "dead\n", buffSize);
-  }
-return ret;
+    return 3;
+
 }
