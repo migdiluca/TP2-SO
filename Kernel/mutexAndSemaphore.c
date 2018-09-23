@@ -115,7 +115,7 @@ int wait(sem_t * sem){
 
     if(sem->value > 0) {
         (sem->value)--;
-        if(getSize(sem->waitAccessQueue)=0)
+        if(getSize(sem->waitAccessQueue)==0)
             sem->used = 0;
         else
             unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
@@ -131,7 +131,7 @@ int wait(sem_t * sem){
         else
             sem->value = -1;
 
-        if(getSize(sem->waitAccessQueue)=0)
+        if(getSize(sem->waitAccessQueue)==0)
             sem->used = 0;
         else
             unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
@@ -160,7 +160,7 @@ int post(sem_t * sem) {
     if(firstWaitingPid != NULL) {
         //Si es mutex (value negativo) y hay esta bloqueado entonces me fijo si el que saco corresponde con su pid
         if(sem->value == -1 && getRunningPid() != *firstWaitingPid) {
-            if(getSize(sem->waitAccessQueue)=0)
+            if(getSize(sem->waitAccessQueue)==0)
                 sem->used = 0;
             else
                 unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
@@ -175,7 +175,7 @@ int post(sem_t * sem) {
     else if(sem->value >= 0)
         (sem->value)++;
 
-    if(getSize(sem->waitAccessQueue)=0)
+    if(getSize(sem->waitAccessQueue)==0)
         sem->used = 0;
     else
         unblockProcess(*(int *)(pop(sem->waitAccessQueue)));
