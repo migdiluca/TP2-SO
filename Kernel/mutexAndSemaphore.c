@@ -279,5 +279,5 @@ int exists(sem_t * sem) {
 }
 
 int cmp(int * pid1, int * pid2) {
-    return 0;
+    return pid1-pid2;
 }
