@@ -11,6 +11,7 @@ static void man(char * str);
 static void echo(char * str);
 static void time();
 static void error();
+void psProcess();
 
 void commandDispatcher(char * commandLine) {
 	int i,j;
@@ -47,6 +48,8 @@ void commandDispatcher(char * commandLine) {
 		resetConsole();
 	else if(strcmp(command,"theme")==1)
 		changeTheme(parameter);
+	else if(strcmp(command,"ps")==1)
+		psProcess();
 	else{
 		error();
 	}
@@ -60,6 +63,7 @@ static void man(char * str) {
 	 char * clear = "clear - Clear the screen";
 	 char * frog = "frog - Displays a frog";
 	 char * theme = "theme - Change console theme. Parameters: text, consoletext, error, background.";
+	char * ps = "ps - Lists information about current processes in system";
 
 	if(*str == 0){
 		printf("This is the command mannual. The following commands are:\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",invalidOp,div0,echo,time,clock,clear,frog,theme);
@@ -101,4 +105,14 @@ static void error(){
 	char * errorMsg = "Command not recognized.";
 	for(i = 0; errorMsg[i] != 0; i++)
 		_syscall(_write,2,errorMsg[i]);
+}
+
+void psProcess(){
+	char* buffer = malloc(1024);
+	printf("\n");
+	printf("pid   state");
+	printf("\n");
+	_syscall(_psProcess, buffer, 1024);
+	printf(buffer);
+	free(buffer);
 }

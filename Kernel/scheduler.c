@@ -1,4 +1,5 @@
 #include "scheduler.h"
+#include "String.h"
 
 char buff[8];
 //static tProcessNode * running;
@@ -299,3 +300,77 @@ void init_(void * startingPoint) {
 //    return running->process->stackPointer;
 //}
 //
+
+void sprintProcesses(char* buffer, int buffSize){
+    TNode* aux;
+    int index = 0;
+    int occ;
+    char pid[0];
+    int s;
+    char* states[4];
+    states[0] = "ready";
+    states[1] = "running";
+    states[2] = "waiting";
+    states[3] = "dead";
+
+     intToString(pid, running->pid);
+     occ = strcpy2(buffer+index,pid,buffSize);
+     index += occ;
+     buffSize -= occ;
+      occ = strcpy2(buffer+index,"     ",buffSize);
+      index += occ;
+     buffSize -= occ;
+
+     s = stateIdentifier(running->state);
+     occ = strcpy2(buffer+index,states[s],buffSize);
+     index+=occ;
+     buffSize-=occ;
+
+
+    if(ready != NULL){
+        aux = ready->first;
+        while(aux!= NULL){
+          tProcess* p = aux->elem;
+          intToString(pid, p->pid);
+          occ = strcpy2(buffer + index, pid, buffSize);
+          index += occ;
+          buffSize -= occ;
+          if(buffSize<=0) break;
+           occ = strcpy2(buffer+index,"     ",buffSize);
+           index+=occ;
+           buffSize-=occ;
+           if(buffSize<=0) break;
+           s = stateIdentifier(p->state);
+           occ = strcpy2(buffer+index,states[s],buffSize);
+           index+=occ;
+           buffSize-=occ;
+           if(buffSize<=0) break;
+           aux = aux->next;
+        }
+
+  }
+
+     if(blocked != NULL){
+         aux = blocked->first;
+         while(aux!= NULL){
+           tProcess* p = aux->elem;
+           intToString(pid, p->pid);
+           occ = strcpy2(buffer + index, pid, buffSize);
+           index += occ;
+           buffSize -= occ;
+           if(buffSize<=0) break;
+            occ = strcpy2(buffer+index,"     ",buffSize);
+            index+=occ;
+            buffSize-=occ;
+            if(buffSize<=0) break;
+            s = stateIdentifier(p->state);
+            occ = strcpy2(buffer+index,states[s],buffSize);
+            index+=occ;
+            buffSize-=occ;
+            if(buffSize<=0) break;
+            aux = aux->next;
+         }
+   }
+
+
+}

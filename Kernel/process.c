@@ -202,3 +202,17 @@ void freeProcessHeap(queueADT heap){
     freeMemory(pop(heap)); //libera lo q quedo reservado y sin liberar y tamb el pop va borrando los nodos de la cola
   }
 }
+
+int stateIdentifier(pState state){
+  if(state == READY){
+     return 0;
+  }
+  else if(state == RUNNING){
+    return 1;
+  }
+  else if(state == WAITING){
+    return 2;
+  }
+    return 3;
+
+}

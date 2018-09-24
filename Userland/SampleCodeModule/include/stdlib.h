@@ -13,6 +13,7 @@ void* malloc(int bytes);
 void free(void* address);
 int exec(void* startingPoint, int cargs, void ** pargs);
 void kill(int pid, int msg);
+void killCurrentProcess();
 
 
 #endif
