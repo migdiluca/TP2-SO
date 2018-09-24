@@ -1,11 +1,39 @@
 #include <stdio.h>
-#include "String.h"
 
-int strcpy2(char* str1, const char* str2, int length);
-void intToString(char* str, int num);
-void reverseCharArray(char* str, int length);
-int numLength(int num);
-char* strcpy3(char* destination, const char* source) ;
+int strcomp(char * s1, char * s2 ) {
+    for (int i = 0; ; i++) {
+        if (s1[i] != s2[i]) {
+            return s1[i] < s2[i] ? -1 : 1;
+        }
+
+        if (s1[i] == '\0') {
+            return 0;
+        }
+    }
+}
+
+char * strconcat(char * s1, char * s2, char * dest) {
+    int s1lenght= strlenght(s1);
+    int s2lenght = strlenght(s2);
+    for(int i = 0, j = 0; i <= s1lenght+s2lenght; i++,j++) {
+        if(i < s1lenght) {
+            dest[i] = s1[j];
+            if(i + 1 >= s1lenght)
+                j = -1;
+        }
+        else {
+            dest[i] = s2[j];
+        }
+    }
+    return dest;
+}
+
+int strlenght(char * s) {
+    int i;
+    for(i = 0; s[i] != '\0'; i++) {
+    }
+    return i;
+}
 
 char* strcpy3(char* destination, const char* source) {
     if (destination == NULL) {
@@ -33,16 +61,16 @@ int strcpy2(char* str1, const char* str2, int length) {
 
 void intToString(char* str, int num) {
   int length = numLength(num);
-  int numLength = length;
+  int lenghtNum = length;
   int i;
 
   if (num < 0) {
     str[length - 1] = '-';
     num *= -1;
-    numLength--;
+      lenghtNum--;
   }
 
-  for (i = 0; i < numLength; i++) {
+  for (i = 0; i < lenghtNum; i++) {
     str[i] = (char)(num % 10 + '0');
     num /= 10;
   }

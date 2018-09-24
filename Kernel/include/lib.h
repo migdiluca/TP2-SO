@@ -2,7 +2,7 @@
 #define LIB_H
 
 #include <stdint.h>
-#include <string.h>
+#include <String.h>
 #include "BuddyAllocationSystem.h"
 
 //Estructura para RGB.

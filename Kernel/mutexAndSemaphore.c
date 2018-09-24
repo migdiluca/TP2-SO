@@ -1,11 +1,10 @@
 #include <stdint.h>
-#include <stdlib.h>
 #include <mutexAndSemaphore.h>
 #include <scheduler.h>
 #include <BuddyAllocationSystem.h>
-#include "queueADT.h"
-#include "types.h"
-#include "testAndSet.h"
+#include <queueADT.h>
+#include <types.h>
+#include <testAndSet.h>
 
 struct pid_list {
     int pid;
@@ -54,8 +53,10 @@ sem_t * semAndMutexOpen(char * name, int flag, int initialValue, int isSemaphore
         searchedSemOrMutex = getMutex(nameID);
 
     if(searchedSemOrMutex != NULL) {
-        if(flag != O_EXCL)
+        if(flag != O_EXCL) {
+
             return searchedSemOrMutex;
+        }
         return NULL;
     }
 
@@ -63,11 +64,17 @@ sem_t * semAndMutexOpen(char * name, int flag, int initialValue, int isSemaphore
     if(newSemOrMutex == NULL)
         return NULL;
 
+    newSemOrMutex->used = 0;
+    newSemOrMutex->waitAccessQueue = newQueue(sizeof(int),cmp);
+    newSemOrMutex->blockedQueue = newQueue(sizeof(int),cmp);
     newSemOrMutex->id = nameID;
     newSemOrMutex->value = initialValue;
-    newSemOrMutex->blockedQueue = newQueue(sizeof(int), cmp);
-    newSemOrMutex->waitAccessQueue = newQueue(sizeof(int),cmp);
-    newSemOrMutex->used = 0;
+
+    pid_list * nodepid = mallocMemory(sizeof(nodepid));
+    nodepid->pid = getRunningPid();
+    nodepid->next = NULL;
+    newSemOrMutex->usedBy = NULL;
+
 
     if(isSemaphore) {
         newSemOrMutex->next = semList;
@@ -268,6 +275,8 @@ sem_t * unlinkR(sem_t * sem, int id) {
 }
 
 int exists(sem_t * sem) {
+    if(sem == NULL)
+        return 0;
     if(sem->value >= 0) {
         if(getSem(sem->id) == NULL)
             return 0;
@@ -277,6 +286,30 @@ int exists(sem_t * sem) {
             return 0;
     }
     return 1;
+}
+
+pid_list * addPid(pid_list * list, int pid) {
+    if(list == NULL) {
+        pid_list *newNode = mallocMemory(sizeof(pid_list));
+        newNode->pid = pid;
+        newNode->next = NULL;
+        return newNode;
+    }
+
+    pid_list * aux = list;
+    pid_list * last = aux;
+    while(aux != NULL) {
+        if(aux->pid == pid)
+            return list;
+        last = aux;
+        aux = aux->next;
+    }
+
+    pid_list *newNode = mallocMemory(sizeof(pid_list));
+    newNode->pid = pid;
+    newNode->next = NULL;
+    last->next = newNode;
+    return list;
 }
 
 int cmp(int * pid1, int * pid2) {
