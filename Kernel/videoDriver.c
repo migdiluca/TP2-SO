@@ -167,19 +167,20 @@ struct vesa_mode {
 	  void writeString(char* string){
 	    struct RGB black = {0,0,0};
 	    while(*string != 0){
-	      writeChar(*string,localx,localy,1);
-	      localx += (CHAR_WIDTH + 1);
-	      if(localx >= screen->width) {
-	      	localx = 0;
-	      	localy += CHAR_HEIGHT + 1;
-	      	if(localy >= screen->height) {
-	      		movePixelsUp(CHAR_HEIGHT + 2, black);
-				localy -= CHAR_HEIGHT + 1;
+	    	writeChar(*string, localx,localy,1);
+	    	localx += CHAR_WIDTH + 1;
+	    	if(localx >= screen->width - CHAR_WIDTH - 1) {
 				localx = 0;
-	      	}
-	      }
-	      string++;
+				localy += CHAR_HEIGHT + 1;
+	    	}
+	    	if(localy >= screen->height - CHAR_HEIGHT - 1) {
+	    		localy-= CHAR_HEIGHT + 1;
+	    		localx= 0;
+	    		movePixelsUp(CHAR_HEIGHT + 1, black);
+	    	}
+	    	string++;
 	    }
+
 	  }
 
 	  void clearScreen() {
