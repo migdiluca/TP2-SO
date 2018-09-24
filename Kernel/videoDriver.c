@@ -166,6 +166,7 @@ struct vesa_mode {
 
 	  void writeString(char* string){
 	    struct RGB black = {0,0,0};
+
 	    while(*string != 0){
 	    	writeChar(*string, localx,localy,1);
 	    	localx += CHAR_WIDTH + 1;
